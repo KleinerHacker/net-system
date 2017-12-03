@@ -13,12 +13,12 @@ namespace Net.System.Native.Type
     {
         public int Length { get; set; }
         public int Flags { get; set; }
-        public int ShowCmd { get; set; }
+        public User32.Window.WindowCmd ShowCmd { get; set; }
         public Point MinPosition { get; set; }
         public Point MaxPosition { get; set; }
         public Rectangle NormalPosition { get; set; }
 
-        public NativeWindowPlacement(int length, int flags, int showCmd, Point minPosition, Point maxPosition, Rectangle normalPosition)
+        public NativeWindowPlacement(int length, int flags, User32.Window.WindowCmd showCmd, Point minPosition, Point maxPosition, Rectangle normalPosition)
         {
             Length = length;
             Flags = flags;

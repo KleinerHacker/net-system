@@ -63,6 +63,14 @@ namespace Net.System.Type
             }
         }
 
+        public bool IsInFront => User32.Window.GetForegroundWindow() == WindowHandle;
+
+        public bool IsEnabled
+        {
+            get { return User32.Window.IsWindowEnabled(WindowHandle); }
+            set { User32.Window.EnableWindow(WindowHandle, value); }
+        }
+
         internal ProcessWindow(IntPtr windowHandle, Process process)
         {
             WindowHandle = windowHandle;
@@ -79,7 +87,7 @@ namespace Net.System.Type
             if (!Process.HasWindow())
                 throw new InvalidOperationException("Process with id " + Process.Id + " has no window.");
 
-            User32.Window.ShowWindow(Process.MainWindowHandle, User32.Window.WindowCmdRestore);
+            User32.Window.ShowWindow(Process.MainWindowHandle, User32.Window.WindowCmd.Restore);
         }
 
         /// <summary>
@@ -92,7 +100,7 @@ namespace Net.System.Type
             if (!Process.HasWindow())
                 throw new InvalidOperationException("Process with id " + Process.Id + " has no window.");
 
-            User32.Window.ShowWindow(Process.MainWindowHandle, User32.Window.WindowCmdHide);
+            User32.Window.ShowWindow(Process.MainWindowHandle, User32.Window.WindowCmd.Hide);
         }
 
         /// <summary>
@@ -105,7 +113,7 @@ namespace Net.System.Type
             if (!Process.HasWindow())
                 throw new InvalidOperationException("Process with id " + Process.Id + " has no window.");
 
-            User32.Window.ShowWindow(Process.MainWindowHandle, User32.Window.WindowCmdMinimize);
+            User32.Window.ShowWindow(Process.MainWindowHandle, User32.Window.WindowCmd.Minimize);
         }
 
         /// <summary>
@@ -118,7 +126,7 @@ namespace Net.System.Type
             if (!Process.HasWindow())
                 throw new InvalidOperationException("Process with id " + Process.Id + " has no window.");
 
-            User32.Window.ShowWindow(Process.MainWindowHandle, User32.Window.WindowCmdMaximize);
+            User32.Window.ShowWindow(Process.MainWindowHandle, User32.Window.WindowCmd.Maximize);
         }
 
         /// <summary>
@@ -132,6 +140,19 @@ namespace Net.System.Type
                 throw new InvalidOperationException("Process with id " + Process.Id + " has no window.");
 
             User32.Window.SetForegroundWindow(Process.MainWindowHandle);
+        }
+
+        /// <summary>
+        /// Switch to this window
+        /// </summary>
+        public void SwitchToThis()
+        {
+            if (Process.HasExited)
+                throw new InvalidOperationException("Process with id " + Process.Id + " has died");
+            if (!Process.HasWindow())
+                throw new InvalidOperationException("Process with id " + Process.Id + " has no window.");
+
+            User32.Window.SwitchToThisWindow(Process.MainWindowHandle, true);
         }
 
         /// <summary>

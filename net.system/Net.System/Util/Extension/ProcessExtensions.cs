@@ -34,7 +34,14 @@ namespace Net.System.Util.Extension
         /// <returns></returns>
         public static bool HasWindow(this Process process)
         {
-            return process.MainWindowHandle != IntPtr.Zero;
+            try
+            {
+                return process.MainWindowHandle != IntPtr.Zero;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
         }
 
         /// <summary>
@@ -44,6 +51,20 @@ namespace Net.System.Util.Extension
         /// <returns></returns>
         public static bool IsInFront(this Process process)
         {
+            IntPtr hwnd;
+            return IsInFront(process, out hwnd);
+        }
+
+        /// <summary>
+        /// TRUE if process window is in front now, otherwise FALSE
+        /// </summary>
+        /// <param name="process"></param>
+        /// <param name="hwnd"></param>
+        /// <returns></returns>
+        public static bool IsInFront(this Process process, out IntPtr hwnd)
+        {
+            hwnd = IntPtr.Zero;
+
             var foregroundWindow = User32.Window.GetForegroundWindow();
             if (foregroundWindow == IntPtr.Zero)
                 return false;
@@ -51,7 +72,13 @@ namespace Net.System.Util.Extension
             int id;
             User32.Window.GetWindowThreadProcessId(foregroundWindow, out id);
 
-            return process.Id == id;
+            var isInFront = process.Id == id;
+            if (isInFront)
+            {
+                hwnd = foregroundWindow;
+            }
+
+            return isInFront;
         }
 
         /// <summary>
@@ -66,7 +93,14 @@ namespace Net.System.Util.Extension
             if (!process.HasWindow())
                 throw new InvalidOperationException("Process with id " + process.Id + " has no window.");
 
-            return new ProcessWindow(process.MainWindowHandle, process);
+            try
+            {
+                return new ProcessWindow(process.MainWindowHandle, process);
+            }
+            catch (Exception e)
+            {
+                throw new InvalidOperationException("Process with id " + process.Id + " cannot get window.", e);
+            }
         }
 
         public static ProcessWindow[] GetAllWindows(this Process process)
